@@ -7,29 +7,36 @@ class Starbucks {
 	private $cookies_location;
 
 	public $customer_name;
-	public $star_balance;
+	public $stars;
+	public $rewards;
 	public $dollar_balance;
-	public $dollar_balance_datestamp;
+	public $dollar_balance_updated;
 
 	const TIMEOUT = 15;
 	const CONNECTIONTIMEOUT = 10;
 
-	public function __construct($username, $password) {
+	public function __construct($username, $password, $update = true) {
 		if (!extension_loaded('curl')) {
 			throw new exception('PHP extension cURL is not loaded.');
 		}
 		$this->username = $username;
 		$this->password = $password;
 		$this->cookies_location = 'cookies.'.md5($username.$password);
+		if ($update) $this->update();
+	}
+
+	public function cleanup() {
+		file_put_contents($this->cookies_location, null);
 	}
 
 	public function update() {
 		$html = $this->login();
 
 		$this->customer_name = $this->parse_data($html, 'customer_full_name');
-		$this->star_balance = $this->parse_data($html, 'cumulative_star_balance');
+		$this->stars = $this->parse_data($html, 'cumulative_star_balance');
+		$this->rewards = $this->parse_data($html, 'num_unredeemed_rewards');
 		$this->dollar_balance = $this->parse_data($html, 'card_dollar_balance');
-		$this->dollar_balance_datestamp = $this->parse_data($html, 'card_balance_date') . ' ' . $this->parse_data($html, 'card_balance_time');
+		$this->dollar_balance_updated = $this->parse_data($html, 'card_balance_date') . ' ' . $this->parse_data($html, 'card_balance_time');
 	}
 
 	public function login() {
@@ -52,7 +59,7 @@ class Starbucks {
 	}
 
 	public function force_login() {
-		file_put_contents($this->cookies_location, null);
+		$this->cleanup();
 		return $this->login();
 	}
 
