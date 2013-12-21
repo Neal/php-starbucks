@@ -8,7 +8,7 @@ Check `example.php` for example usage.
 
 Assuming this repo is at `http://ineal.me/starbucks/`, the API will be at `http://ineal.me/starbucks/api.php`.
 
-	$ curl -i -X POST http://ineal.me/starbucks/api.php --data "username=__USERNAME__&password=__PASSWORD__"
+	$ curl -i -X POST http://ineal.me/starbucks/api.php -F username=USERNAME -F password=PASSWORD
 
 	> POST /starbucks/api.php HTTP/1.1
 	> Host: ineal.me
